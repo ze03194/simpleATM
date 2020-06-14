@@ -1,8 +1,11 @@
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -10,7 +13,7 @@ public class User {
     private String firstName, lastName, dateOfBirth, userName, userPassword;
     private String securityPin;
     private double balance = 0;
-    private static HashMap<String, User> userHashMap = new HashMap<>();
+    private static Map<String, User> userHashMap = new HashMap<>();
     private static Scanner reader = new Scanner(System.in);
     private static Gson gson = new Gson();
 
@@ -72,6 +75,13 @@ public class User {
         System.out.println("Please Register\n");
         System.out.print("Username: ");
         user.userName = reader.nextLine();
+
+        while (checkUserExists(user.userName)) {
+            System.out.println(user.userName + " is already registered. Please choose a new username\nUsername: ");
+            user.userName = reader.nextLine();
+            checkUserExists(user.userName);
+        }
+
         System.out.print("Password: ");
         user.userPassword = reader.nextLine();
         System.out.print("Security Pin: ");
@@ -102,6 +112,7 @@ public class User {
         System.out.println("Security Pin: ");
         inputUserPin = reader.nextLine();
 
+
         checkCredentials(inputUserPass, inputUserPin);
     }
 
@@ -118,13 +129,13 @@ public class User {
         do {
             System.out.println("Select from the following options: ");
             System.out.println("1. Deposit\n2. Withdrawal\n3. Check Balance\n4. Change Password\n" +
-                    "5. Change Pin\n6. End Account\n7. Return to Main Menu\n");
+                    "5. Change Pin\n6. End Account\n7. Return to Main Menu\n8. Exit");
 
             try {
                 input = reader.nextInt();
                 reader.nextLine();
-                while (input < 1 || input > 7) {
-                    System.out.println("Invalid Menu Option. Please choose a number from 1 through 7\n");
+                while (input < 1 || input > 8) {
+                    System.out.println("Invalid Menu Option. Please choose a number from 1 through 8\n");
                     input = reader.nextInt();
                     reader.nextLine();
                 }
@@ -164,6 +175,9 @@ public class User {
                     break;
                 case 7:
                     return;
+                case 8:
+                    saveUsers();
+                    System.exit(0);
             }
 
             System.out.print("Would you like to perform another task? Y/N: ");
@@ -172,6 +186,11 @@ public class User {
 
         } while (again == 'Y');
         System.exit(0);
+    }
+
+    // checkUserExists method to prevent duplicate users
+    public static boolean checkUserExists(String inputUserName) {
+        return userHashMap.containsKey(inputUserName);
     }
 
     // checkCredentials() method to ensure user password and security pin maps with currentUser
@@ -241,7 +260,7 @@ public class User {
             }
         }
     }
-    
+
     // changePin() method to allow currentUser to change securityPin
     public void changePin() {
         int numTries = 0;
@@ -260,18 +279,23 @@ public class User {
         }
     }
 
-    // readUsersFile() method to convert and read JSON from "registeredUsers.json" to userHashMap of type HashMap 
+    // readUsersFile() method to convert and read JSON from "registeredUsers.json" to userHashMap of type HashMap
     public static void readUsersFile() {
+
         try {
-            Reader reader = new FileReader("registeredUsers.json");
-            userHashMap = gson.fromJson(reader, HashMap.class);
-            reader.close();
+            Reader fileReader = new FileReader("registeredUsers.json");
+
+            Type type = new TypeToken<Map<String, User>>() {
+            }.getType();
+            userHashMap = gson.fromJson(fileReader, type);
+            fileReader.close();
         } catch (Exception e) {
             e.addSuppressed(new FileNotFoundException());
         }
 
+
     }
-    
+
     // saveUsers() method to convert and write userHashMap of type HashMap to JSON in "registeredUsers.json" file
     public static void saveUsers() {
         try {
