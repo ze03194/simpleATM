@@ -258,6 +258,7 @@ public class User implements Serializable {
         }
     }
 
+    // readUsersFile() method to convert and read JSON from "registeredUsers.json" to userHashMap of type HashMap 
     public static void readUsersFile() {
         try {
             Reader reader = new FileReader("registeredUsers.json");
@@ -268,7 +269,8 @@ public class User implements Serializable {
         }
 
     }
-
+    
+    // saveUsers() method to convert and write userHashMap of type HashMap to JSON in "registeredUsers.json" file
     public static void saveUsers() {
         try {
             Writer writer = new FileWriter("registeredUsers.json");
