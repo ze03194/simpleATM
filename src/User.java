@@ -6,7 +6,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
-public class User implements Serializable {
+public class User {
     private String firstName, lastName, dateOfBirth, userName, userPassword;
     private String securityPin;
     private double balance = 0;
@@ -225,6 +225,7 @@ public class User implements Serializable {
         return null;
     }
 
+    // changePassword() method to allow currentUser to change userPassword
     public void changePassword() {
         int numTries = 0;
         while (numTries < 3) {
@@ -240,7 +241,8 @@ public class User implements Serializable {
             }
         }
     }
-
+    
+    // changePin() method to allow currentUser to change securityPin
     public void changePin() {
         int numTries = 0;
 
