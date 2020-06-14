@@ -1,7 +1,10 @@
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
 
 public class User implements Serializable {
     private String firstName, lastName, dateOfBirth, userName, userPassword;
@@ -9,6 +12,7 @@ public class User implements Serializable {
     private double balance = 0;
     private static HashMap<String, User> userHashMap = new HashMap<>();
     private static Scanner reader = new Scanner(System.in);
+    private static Gson gson = new Gson();
 
     // displayMenu() method to print options to user
     public static void displayMenu() {
@@ -83,7 +87,6 @@ public class User implements Serializable {
         System.out.println();
 
         userHashMap.put(user.userName, user);
-
 
         System.out.println("Registration Successful!\n");
 
@@ -257,11 +260,9 @@ public class User implements Serializable {
 
     public static void readUsersFile() {
         try {
-            FileInputStream fis = new FileInputStream("registeredUsers.ser");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            userHashMap = (HashMap) ois.readObject();
-            ois.close();
-            fis.close();
+            Reader reader = new FileReader("registeredUsers.json");
+            userHashMap = gson.fromJson(reader, HashMap.class);
+            reader.close();
         } catch (Exception e) {
             e.addSuppressed(new FileNotFoundException());
         }
@@ -270,11 +271,9 @@ public class User implements Serializable {
 
     public static void saveUsers() {
         try {
-            FileOutputStream fos = new FileOutputStream("registeredUsers.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(userHashMap);
-            oos.close();
-            fos.close();
+            Writer writer = new FileWriter("registeredUsers.json");
+            gson.toJson(userHashMap, writer);
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
