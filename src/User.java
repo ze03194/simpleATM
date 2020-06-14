@@ -55,7 +55,7 @@ public class User implements Serializable {
                     registerUser();
                     break;
                 case 3:
-                    System.exit(0);
+                    return;
             }
 
         } while (true);
@@ -84,15 +84,6 @@ public class User implements Serializable {
 
         userHashMap.put(user.userName, user);
 
-        try {
-            FileOutputStream fos = new FileOutputStream("registeredUsers.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(userHashMap);
-            oos.close();
-            fos.close();
-        } catch (IOException e) {
-            System.out.println("error");
-        }
 
         System.out.println("Registration Successful!\n");
 
@@ -220,24 +211,12 @@ public class User implements Serializable {
     public static User getUser() {
         System.out.println("Username: ");
         String inputUserName = reader.nextLine();
-        boolean bError = true;
         HashMap<String, User> getMap = new HashMap<>();
 
-        try {
-            FileInputStream fis = new FileInputStream("registeredUsers.ser");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            getMap = (HashMap) ois.readObject();
-            ois.close();
-            fis.close();
-            if (getMap.containsKey(inputUserName)) {
-                return getMap.get(inputUserName);
-            } else {
-                System.out.println(inputUserName + " is not registered\n");
-                return null;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (userHashMap.containsKey(inputUserName)) {
+            return userHashMap.get(inputUserName);
+        } else {
+            System.out.println(inputUserName + " is not registered\n");
         }
 
         return null;
@@ -273,6 +252,31 @@ public class User implements Serializable {
                 System.out.println("Wrong pin!\n Number of tries remaining: "
                         + (3 - numTries));
             }
+        }
+    }
+
+    public static void readUsersFile() {
+        try {
+            FileInputStream fis = new FileInputStream("registeredUsers.ser");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            userHashMap = (HashMap) ois.readObject();
+            ois.close();
+            fis.close();
+        } catch (Exception e) {
+            e.addSuppressed(new FileNotFoundException());
+        }
+
+    }
+
+    public static void saveUsers() {
+        try {
+            FileOutputStream fos = new FileOutputStream("registeredUsers.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(userHashMap);
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
